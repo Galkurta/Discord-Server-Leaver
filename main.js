@@ -167,7 +167,9 @@ client.on("ready", async () => {
       if (confirm.toLowerCase() === "y") {
         console.log("\nStarting server leave process...");
         console.log(
-          "Adding 5 seconds delay between each leave to avoid bans.\n"
+          `Adding ${
+            LEAVE_DELAY / 1000
+          } seconds delay between each leave to avoid bans.\n`
         );
 
         for (let i = 0; i < selectedServers.length; i++) {
@@ -180,7 +182,8 @@ client.on("ready", async () => {
             // Show delay message if there are more servers to leave
             if (i < selectedServers.length - 1) {
               process.stdout.write("Waiting for next leave");
-              for (let j = 0; j < 5; j++) {
+              const delaySteps = LEAVE_DELAY / 1000; // Convert to seconds
+              for (let j = 0; j < delaySteps; j++) {
                 await delay(1000);
                 process.stdout.write(".");
               }
