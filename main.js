@@ -7,6 +7,9 @@ const client = new Client({
   checkUpdate: false,
 });
 
+// Constants
+const LEAVE_DELAY = 5000; // 5 seconds delay between each leave
+
 // Display banner when program starts
 console.log(banner);
 
@@ -19,6 +22,11 @@ const rl = readline.createInterface({
 // Enable raw mode for reading key presses
 readline.emitKeypressEvents(process.stdin);
 process.stdin.setRawMode(true);
+
+// Utility function for delay
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 // Promise wrapper for readline question
 function question(query) {
@@ -158,11 +166,26 @@ client.on("ready", async () => {
 
       if (confirm.toLowerCase() === "y") {
         console.log("\nStarting server leave process...");
-        for (const server of selectedServers) {
+        console.log(
+          "Adding 5 seconds delay between each leave to avoid bans.\n"
+        );
+
+        for (let i = 0; i < selectedServers.length; i++) {
+          const server = selectedServers[i];
           try {
             const guild = client.guilds.cache.get(server.id);
             await guild.leave();
             console.log(`✅ Successfully left server: ${server.name}`);
+
+            // Show delay message if there are more servers to leave
+            if (i < selectedServers.length - 1) {
+              process.stdout.write("Waiting for next leave");
+              for (let j = 0; j < 5; j++) {
+                await delay(1000);
+                process.stdout.write(".");
+              }
+              console.log("\n");
+            }
           } catch (error) {
             console.error(`❌ Failed to leave server ${server.name}:`, error);
           }
